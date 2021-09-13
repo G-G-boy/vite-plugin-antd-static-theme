@@ -1,0 +1,40 @@
+{
+  "name": "vite-plugin-antd-static-theme",
+  "version": "0.0.1",
+  "description": "vite antd theme plugin",
+  "main": "dist/index.js",
+  "repository": "git@github.com:G-G-boy/vite-plugin-antd-static-theme.git",
+  "author": "gavin <1159782348@qq.com>",
+  "license": "MIT",
+  "keywords": [
+    "antd",
+    "ant",
+    "design",
+    "pro",
+    "theme",
+    "vite"
+  ],
+  "scripts": {
+    "build": "tsc src/*.ts --target esnext --module commonjs --outdir dist --esModuleInterop true --moduleResolution node --declaration true"
+  },
+  "devDependencies": {
+    "@types/minimist": "^1.2.2",
+    "@types/node": "^16.9.1",
+    "@types/normalize-package-data": "^2.4.1",
+    "@types/rimraf": "^3.0.2",
+    "@types/serve-static": "^1.13.10",
+    "typescript": "^4.4.3"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "antd-pro-merge-less": "^3.0.11",
+    "rimraf": "^3.0.2",
+    "serve-static": "^1.14.1",
+    "slash2": "^2.0.0"
+  },
+  "peerDependencies": {
+    "vite": "^2.5.6"
+  }
+}
