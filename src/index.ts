@@ -1,14 +1,45 @@
-import type { Plugin, ResolvedConfig } from 'vite';
-import { existsSync, mkdirSync } from 'fs';
-import { join } from 'path';
-import  rimraf from 'rimraf';
+import type {Plugin, ResolvedConfig} from 'vite';
+import {existsSync, mkdirSync} from 'fs';
+import {join} from 'path';
+import rimraf from 'rimraf';
 import defaultTheme from './defaultTheme';
-import  serveStatic from 'serve-static';
+import serveStatic from 'serve-static';
 
 const buildCss = require('antd-pro-merge-less');
 const winPath = require('slash2');
 
-const ViteAntdStaticTheme = (): Plugin => {
+export interface Theme {
+    key?: string;
+    theme?: string;
+    fileName?: string;
+    modifyVars?: Record<string, string>;
+}
+
+export interface Options {
+    theme: Theme[];
+    /**
+     * 是否压缩css
+     */
+    min?: boolean;
+    /**
+     * css module
+     */
+    isModule?: boolean;
+    /**
+     * 忽略 antd 的依赖
+     */
+    ignoreAntd?: boolean;
+    /**
+     * 忽略 pro-layout
+     */
+    ignoreProLayout?: boolean;
+    /**
+     * 不使用缓存
+     */
+    cache?: boolean;
+}
+
+const ViteAntdStaticTheme = (options: Options = defaultTheme): Plugin => {
     let config: ResolvedConfig;
     return {
         name: 'vite-plugin-antd-static-theme',
@@ -40,28 +71,19 @@ const ViteAntdStaticTheme = (): Plugin => {
 
                 buildCss(
                     process.cwd(),
-                    defaultTheme.theme.map((theme) => ({
+                    options.theme.map((theme) => ({
                         ...theme,
                         fileName: winPath(join(themeTemp, 'theme', theme.fileName)),
                     })),
                     {
-                        // 是否压缩css
-                        min: false,
-                        // css module
-                        isModule: false,
-                        // 忽略 antd 的依赖,用于打包 antd 自己的依赖
-                        ignoreAntd: false,
-                        // 忽略 pro-layout 的依赖
-                        ignoreProLayout: true,
-                        // 不使用缓存
-                        cache: false,
+                        ...options,
                     },
                 )
                     .then(() => {
                         console.log('🎊  build theme success');
                     })
                     .catch((err: any) => {
-                        console.log(err);
+                        // console.log(err)
                     });
             };
         },
@@ -72,7 +94,7 @@ const ViteAntdStaticTheme = (): Plugin => {
                     {
                         tag: 'script',
                         children: `window.vite_plugin_ant_themeVar = ${JSON.stringify(
-                            defaultTheme.theme,
+                            options.theme,
                         )}`,
                         injectTo: 'head',
                     },
@@ -81,7 +103,7 @@ const ViteAntdStaticTheme = (): Plugin => {
         },
         generateBundle() {
             console.log('build theme');
-            const { outDir } = config.build;
+            const {outDir} = config.build;
             const outputPath = join(process.cwd(), outDir);
             const themePath = winPath(join(outputPath, 'theme'));
             try {
@@ -95,28 +117,20 @@ const ViteAntdStaticTheme = (): Plugin => {
 
             buildCss(
                 process.cwd(),
-                defaultTheme.theme.map((theme) => ({
+                options.theme.map((theme) => ({
                     ...theme,
                     fileName: winPath(join(outputPath, 'theme', theme.fileName)),
                 })),
                 {
-                    // 是否压缩css
-                    min: false,
-                    // css module
-                    isModule: false,
-                    // 忽略 antd 的依赖,用于打包 antd 自己的依赖
-                    ignoreAntd: false,
-                    // 忽略 pro-layout 的依赖
-                    ignoreProLayout: true,
-                    // 不使用缓存
-                    cache: false,
+                    min: true,
+                    ...options,
                 },
             )
                 .then(() => {
                     console.log('🎊  build theme success');
                 })
                 .catch((err: any) => {
-                    console.log(err);
+                    // console.log(err)
                 });
         },
     };
